@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - Dono da Loja</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <header>
+        <h1>Visualizar Pedidos</h1>
+        <p>Bem-vindo, dono da loja! Aqui estão todos os pedidos realizados.</p>
+    </header>
+
+    <section>
+        <button onclick="buscarPedidos()">Carregar Pedidos</button>
+        <table id="pedidosTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Nome do Cliente</th>
+                    <th>Item do Pedido</th>
+                    <th>Forma de Pagamento</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="pedidosList">
+                <!-- Os pedidos serão carregados aqui -->
+            </tbody>
+        </table>
+    </section>
+
+    <script>
+        // Função para buscar os pedidos e exibi-los na tabela
+        function buscarPedidos() {
+            fetch('http://localhost:8080/getPedidos')  // URL da API
+                .then(response => response.json())
+                .then(pedidos => {
+                    const pedidosList = document.getElementById('pedidosList');
+                    const pedidosTable = document.getElementById('pedidosTable');
+                    pedidosList.innerHTML = '';  // Limpa a lista antes de adicionar novos itens
+
+                    pedidos.forEach(pedido => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${pedido.nome}</td>
+                            <td>${pedido.intemPedido}</td>
+                            <td>${pedido.formaDepagamneto}</td>
+                            <td>
+                                <button class="finalizar">Finalizar</button>
+                                <button class="cancelar">Cancelar</button>
+                            </td>
+                        `;
+                        pedidosList.appendChild(row);
+                    });
+
+                    pedidosTable.style.display = 'table';  // Mostra a tabela
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar pedidos:', error);
+                    alert('Erro ao carregar pedidos!');
+                });
+        }
+    </script>
+</body>
+</html>
+             
