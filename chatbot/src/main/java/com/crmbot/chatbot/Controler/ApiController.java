@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;  // Importando a interface correta para List
@@ -61,9 +63,37 @@ public class ApiController {
         List<Pedidos> pedidos = contatosService.buscarTodosPedidos(); // Aqui você busca todos os pedidos do banco de dados
         return ResponseEntity.ok(pedidos);
     }
+
+    @PostMapping("/api/pedidos/{idpedido}/finalizar")
+    public ResponseEntity<?> finalizarPedidos(@PathVariable("idpedido") Long idpedido) {
+        try {
+            Pedidos pedidoFinalizado = contatosService.finalizarpedido(idpedido); 
+            return ResponseEntity.ok(pedidoFinalizado); 
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro interno ao finalizar o pedido");
+        }
+    }
+
+
+    @GetMapping("/getPedidosFinalizados")
+    public List<Pedidos> getPedidosFinalizados() {
+        return contatosService.buscaPedidosCancelados();
+    }
+
+
+
+    @RequestMapping("/index.html")
+public String home() {
+    return "index.html"; // Nome da página HTML, se estiver no diretório "templates".
+}
+ 
+}
+
+   
     
-    
-}    
+  
 
    
     
