@@ -17,6 +17,10 @@ public class Pedidos {
     private String IntemPedido;
     private String FormaDepagamneto;
     private String status;
+
+    public Pedidos(){
+        this.status = "Pendente";
+    }
     public String getStatus() {
         return status;
     }

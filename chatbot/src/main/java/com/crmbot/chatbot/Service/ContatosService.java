@@ -46,7 +46,7 @@ public class ContatosService {
         }
     }
 
-    // Método para registrar um pedido
+   
     public Pedidos PedidosClientes(String Nome, String IntemPedido, String FormaDepagamneto) {
         try {
             Pedidos pedidos = new Pedidos();
@@ -67,10 +67,11 @@ public class ContatosService {
         return null;
     }
 
-    // Método para buscar todos os pedidos
-    public List<Pedidos> buscarTodosPedidos() {
-        return pedidosRepository.findAll();  // Retorna todos os pedidos
-    }
+ // Método para buscar pedidos com status Pendente ou Finalizado
+public List<Pedidos> buscarTodosPedidos() {
+    return pedidosRepository.findByStatusPendenteOuFinalizado();  // Retorna pedidos com status "Pendente" ou "Finalizado"
+}
+
 
     // Método para finalizar um pedido
     @Transactional
@@ -91,8 +92,18 @@ public Pedidos finalizarpedido(Long pedidoId) {
             })
             .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + pedidoId));
 }
-    // Método para buscar pedidos finalizados
+   
     public List<Pedidos> buscaPedidosCancelados() {
         return pedidosRepository.findByStatus("Finalizado");  // Exemplo de método para buscar pedidos finalizados
     }
+    public List<Pedidos> buscaPedidosPendetes() {
+        return pedidosRepository.findByStatus("Pendente");  // Exemplo de método para buscar pedidos finalizados
+    }
+
+    public List<Pedidos> buscarPedidosPorStatus(String status) {
+        return pedidosRepository.findByStatus(status); // Supondo que você tenha um método no seu repository
+    }
+    
+
+    
 }

@@ -58,11 +58,11 @@ public class ApiController {
         }
     }
 
-     @GetMapping("/getPedidos")
-    public ResponseEntity<List<Pedidos>> getPedidos() {
-        List<Pedidos> pedidos = contatosService.buscarTodosPedidos(); // Aqui você busca todos os pedidos do banco de dados
-        return ResponseEntity.ok(pedidos);
-    }
+    @GetMapping("/getPedidos")
+public ResponseEntity<List<Pedidos>> getPedidos(@RequestParam(value = "status", defaultValue = "Pendente") String status) {
+    List<Pedidos> pedidos = contatosService.buscarPedidosPorStatus(status); // Passando status como parâmetro
+    return ResponseEntity.ok(pedidos);
+}
 
     @PostMapping("/api/pedidos/{idpedido}/finalizar")
     public ResponseEntity<?> finalizarPedidos(@PathVariable("idpedido") Long idpedido) {
@@ -76,10 +76,18 @@ public class ApiController {
         }
     }
 
-
+    // Método para buscar pedidos com status "Finalizado"
     @GetMapping("/getPedidosFinalizados")
-    public List<Pedidos> getPedidosFinalizados() {
-        return contatosService.buscaPedidosCancelados();
+    public ResponseEntity<List<Pedidos>> getPedidosFinalizados() {
+        List<Pedidos> pedidosFinalizados = contatosService.buscaPedidosCancelados();  // Busca pedidos finalizados
+        return ResponseEntity.ok(pedidosFinalizados);
+    }
+
+    // Método para buscar pedidos com status "Pendente"
+    @GetMapping("/getPedidosPendentes")
+    public ResponseEntity<List<Pedidos>> getPedidosPendentes() {
+        List<Pedidos> pedidosPendentes = contatosService.buscaPedidosPendetes();  // Busca pedidos pendentes
+        return ResponseEntity.ok(pedidosPendentes);
     }
 
 
