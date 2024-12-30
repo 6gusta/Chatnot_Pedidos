@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;  // Importando a interface correta para List
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 
@@ -47,6 +49,9 @@ public class ApiController {
             System.out.println("Item do Pedido: " + pedidos.getIntemPedido());
             System.out.println("Nome: " + pedidos.getNome());
             System.out.println("Forma de Pagamento: " + pedidos.getFormaDepagamneto());
+                    // Captura a data e hora atual
+            
+
     
             // Chama o serviço para salvar os dados no CRM
             contatosService.PedidosClientes(pedidos.getNome(), pedidos.getIntemPedido(), pedidos.getFormaDepagamneto());
@@ -96,8 +101,25 @@ public ResponseEntity<List<Pedidos>> getPedidos(@RequestParam(value = "status", 
 public String home() {
     return "index.html"; // Nome da página HTML, se estiver no diretório "templates".
 }
- 
+
+@DeleteMapping("/pedidos/{idpedido}")
+    public ResponseEntity<String> cancelarPedido(@PathVariable Long idpedido) {
+        try {
+            boolean sucesso = contatosService.cancelarPedido(idpedido);  // Chama o método no serviço para cancelar o pedido
+
+            if (sucesso) {
+                return ResponseEntity.ok("Pedido cancelado com sucesso.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pedido não encontrado.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao cancelar o pedido: " + e.getMessage());
+        }
+    }
 }
+
+
+
 
    
     

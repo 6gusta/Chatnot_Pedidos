@@ -9,6 +9,7 @@ import com.crmbot.chatbot.Repository.PedidosRepository;
 
 import jakarta.transaction.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,15 +50,21 @@ public class ContatosService {
    
     public Pedidos PedidosClientes(String Nome, String IntemPedido, String FormaDepagamneto) {
         try {
+
+            LocalDateTime dataHoraAtual = LocalDateTime.now();
             Pedidos pedidos = new Pedidos();
             pedidos.setNome(Nome);
             pedidos.setIntemPedido(IntemPedido);
             pedidos.setFormaDepagamneto(FormaDepagamneto);
+            pedidos.setDataHoraRecebimento(dataHoraAtual);
+
+           
 
             System.out.println("=-=-=-=- Pedido =-=-=-=- ");
             System.out.println("Pedido : " + pedidos.getIntemPedido());
             System.out.println("Nome Do Cliente : " + pedidos.getNome());
             System.out.println("Forma de Pagamento : " + pedidos.getFormaDepagamneto());
+           
 
             return pedidosRepository.save(pedidos);
 
@@ -67,11 +74,22 @@ public class ContatosService {
         return null;
     }
 
- // Método para buscar pedidos com status Pendente ou Finalizado
-public List<Pedidos> buscarTodosPedidos() {
-    return pedidosRepository.findByStatusPendenteOuFinalizado();  // Retorna pedidos com status "Pendente" ou "Finalizado"
-}
 
+    public boolean cancelarPedidos(Long pedidoId){
+        try {
+
+            pedidosRepository.deleteById(pedidoId);
+            return true;
+
+            
+            
+        } catch (Exception e) {
+            System.out.println("Erro ao cancelar o pedido: " + e.getMessage());
+            return false;  
+        }
+    }
+
+ 
 
     // Método para finalizar um pedido
     @Transactional
@@ -83,7 +101,11 @@ public Pedidos finalizarpedido(Long pedidoId) {
                     pedido.setStatus("Finalizado");
                     Pedidos pedidoSalvo = pedidosRepository.save(pedido);
                     System.out.println("Pedido salvo: " + pedidoSalvo);
+                    LocalDateTime dataHoraAtual = LocalDateTime.now();
+                    Pedidos pedidos = new Pedidos();
+                    pedidos.setDataHoraRecebimento(dataHoraAtual);
                     return pedidoSalvo;
+                
                 } catch (Exception e) {
                     System.err.println("Erro ao salvar o pedido: " + e.getMessage()); // Log de erro
                     e.printStackTrace(); // Imprime o stack trace para depuração
@@ -103,7 +125,24 @@ public Pedidos finalizarpedido(Long pedidoId) {
     public List<Pedidos> buscarPedidosPorStatus(String status) {
         return pedidosRepository.findByStatus(status); // Supondo que você tenha um método no seu repository
     }
+
+
+    public boolean cancelarPedido(Long pedidoId) {
+        try {
+            // Verifica se o pedido existe
+            Optional<Pedidos> pedido = pedidosRepository.findById(pedidoId);
+            if (pedido.isPresent()) {
+                pedidosRepository.deleteById(pedidoId);  // Deleta o pedido
+                return true;  // Retorna sucesso se o pedido foi cancelado
+            }
+            return false;  // Retorna falso se o pedido não for encontrado
+        } catch (Exception e) {
+            return false;  // Caso ocorra algum erro
+        }
+    }
+}
+
     
 
     
-}
+

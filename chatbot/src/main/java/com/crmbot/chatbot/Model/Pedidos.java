@@ -1,5 +1,7 @@
 package com.crmbot.chatbot.Model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,7 +19,14 @@ public class Pedidos {
     private String IntemPedido;
     private String FormaDepagamneto;
     private String status;
+    private LocalDateTime dataHoraRecebimento;
 
+    public LocalDateTime getDataHoraRecebimento() {
+        return dataHoraRecebimento;
+    }
+    public void setDataHoraRecebimento(LocalDateTime dataHoraRecebimento) {
+        this.dataHoraRecebimento = dataHoraRecebimento;
+    }
     public Pedidos(){
         this.status = "Pendente";
     }

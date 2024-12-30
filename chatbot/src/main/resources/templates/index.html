@@ -26,6 +26,7 @@
                     <th>Nome do Cliente</th>
                     <th>Item do Pedido</th>
                     <th>Forma de Pagamento</th>
+                    <th>Data e Hoarario</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -43,6 +44,7 @@
                     <th>Nome do Cliente</th>
                     <th>Item do Pedido</th>
                     <th>Forma de Pagamento</th>
+                    <th>Data e Hoarario</th>
                 </tr>
             </thead>
             <tbody id="pedidosListFinalizados">
@@ -118,6 +120,7 @@ function popularTabela(pedidos, tabela, status) {
             <td>${pedido.nome || 'Nome não informado'}</td>
             <td>${pedido.intemPedido || 'Item não informado'}</td>
             <td>${pedido.formaDepagamneto || 'Pagamento não informado'}</td>
+             <td>${pedido.dataHoraRecebimento || 'data não informado'}</td>
             ${status === 'pendente' ? `
                 <td>
                     <button class="finalizar" onclick="finalizarPedido(${pedido.idpedido})">Finalizar</button>
@@ -154,24 +157,28 @@ function finalizarPedido(pedidoId) {
 }
 
 function cancelarPedido(pedidoId) {
-    fetch(`http://localhost:8080/api/pedidos/${pedidoId}/cancelar`, { method: 'POST' })
-        .then(response => {
-            if (response.ok) {
-                alert(`Pedido ${pedidoId} cancelado!`);
-                const pedidosPendentes = document.getElementById('pedidosListPendentes');
-                const pedidoElemento = pedidosPendentes.querySelector(`tr[data-pedido-id="${parseInt(pedidoId)}"]`);
-                if (pedidoElemento) {
-                    pedidosPendentes.removeChild(pedidoElemento);
-                }
-            } else {
-                alert('Erro ao cancelar pedido!');
+    fetch(`http://localhost:8080/pedidos/${pedidoId}`, {  // Corrigido o endpoint aqui
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (response.ok) {
+            alert(`Pedido ${pedidoId} cancelado!`);
+            const pedidosPendentes = document.getElementById('pedidosListPendentes');
+            const pedidoElemento = pedidosPendentes.querySelector(`tr[data-pedido-id="${parseInt(pedidoId)}"]`);
+            if (pedidoElemento) {
+                pedidosPendentes.removeChild(pedidoElemento);
             }
-        })
-        .catch(error => {
-            console.error('Erro ao cancelar pedido:', error);
+        } else {
             alert('Erro ao cancelar pedido!');
-        });
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao cancelar pedido:', error);
+        alert('Erro ao cancelar pedido!');
+    });
 }
+
+
 
     </script>
 </body>
