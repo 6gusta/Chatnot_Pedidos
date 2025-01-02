@@ -75,23 +75,7 @@ public class ContatosService {
     }
 
 
-    public boolean cancelarPedidos(Long pedidoId){
-        try {
 
-            pedidosRepository.deleteById(pedidoId);
-            return true;
-
-            
-            
-        } catch (Exception e) {
-            System.out.println("Erro ao cancelar o pedido: " + e.getMessage());
-            return false;  
-        }
-    }
-
- 
-
-    // Método para finalizar um pedido
     @Transactional
 public Pedidos finalizarpedido(Long pedidoId) {
     System.out.println("Iniciando finalização do pedido com ID: " + pedidoId);
@@ -114,13 +98,19 @@ public Pedidos finalizarpedido(Long pedidoId) {
             })
             .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + pedidoId));
 }
+
+
    
     public List<Pedidos> buscaPedidosCancelados() {
         return pedidosRepository.findByStatus("Finalizado");  // Exemplo de método para buscar pedidos finalizados
     }
+
+
     public List<Pedidos> buscaPedidosPendetes() {
         return pedidosRepository.findByStatus("Pendente");  // Exemplo de método para buscar pedidos finalizados
     }
+
+
 
     public List<Pedidos> buscarPedidosPorStatus(String status) {
         return pedidosRepository.findByStatus(status); // Supondo que você tenha um método no seu repository
@@ -129,17 +119,34 @@ public Pedidos finalizarpedido(Long pedidoId) {
 
     public boolean cancelarPedido(Long pedidoId) {
         try {
-            // Verifica se o pedido existe
-            Optional<Pedidos> pedido = pedidosRepository.findById(pedidoId);
-            if (pedido.isPresent()) {
-                pedidosRepository.deleteById(pedidoId);  // Deleta o pedido
-                return true;  // Retorna sucesso se o pedido foi cancelado
+            // Logando o ID do pedido que estamos tentando cancelar
+            System.out.println("Tentando cancelar o pedido com ID: " +pedidoId);
+    
+            // Verifica se o pedido existe no banco de dados
+            Pedidos pedido = pedidosRepository.findById(pedidoId).orElse(null);
+            
+            if (pedido == null) {
+                System.out.println("Pedido com ID " + pedidoId + " não encontrado.");
+                return false; // Pedido não encontrado
             }
-            return false;  // Retorna falso se o pedido não for encontrado
+    
+            // Logando que encontramos o pedido e estamos tentando excluí-lo
+            System.out.println("Pedido encontrado: " + pedido.toString() + ". Tentando excluir...");
+    
+            // Deletando o pedido
+            pedidosRepository.delete(pedido);
+    
+            // Logando o sucesso da exclusão
+            System.out.println("Pedido com ID " + pedidoId + " excluído com sucesso.");
+            return true; // Pedido excluído com sucesso
         } catch (Exception e) {
-            return false;  // Caso ocorra algum erro
+            // Logando qualquer erro durante o processo
+            System.err.println("Erro ao tentar cancelar o pedido com ID " + pedidoId + ": " + e.getMessage());
+            e.printStackTrace(); // Exibe a stack trace completa para entender onde o erro ocorre
+            return false; // Retorna false em caso de erro
         }
     }
+    
 }
 
     

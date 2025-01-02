@@ -102,8 +102,9 @@ public String home() {
     return "index.html"; // Nome da página HTML, se estiver no diretório "templates".
 }
 
-@DeleteMapping("/pedidos/{idpedido}")
-    public ResponseEntity<String> cancelarPedido(@PathVariable Long idpedido) {
+@DeleteMapping("/api/pedidos/{idpedido}/cancelar")
+    public ResponseEntity<?> cancelarPedidos(@PathVariable("idpedido") Long idpedido){
+
         try {
             boolean sucesso = contatosService.cancelarPedido(idpedido);  // Chama o método no serviço para cancelar o pedido
 
