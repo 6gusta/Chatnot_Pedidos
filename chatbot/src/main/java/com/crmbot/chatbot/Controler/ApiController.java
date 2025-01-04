@@ -81,19 +81,6 @@ public ResponseEntity<List<Pedidos>> getPedidos(@RequestParam(value = "status", 
         }
     }
 
-    // Método para buscar pedidos com status "Finalizado"
-    @GetMapping("/getPedidosFinalizados")
-    public ResponseEntity<List<Pedidos>> getPedidosFinalizados() {
-        List<Pedidos> pedidosFinalizados = contatosService.buscaPedidosCancelados();  // Busca pedidos finalizados
-        return ResponseEntity.ok(pedidosFinalizados);
-    }
-
-    // Método para buscar pedidos com status "Pendente"
-    @GetMapping("/getPedidosPendentes")
-    public ResponseEntity<List<Pedidos>> getPedidosPendentes() {
-        List<Pedidos> pedidosPendentes = contatosService.buscaPedidosPendetes();  // Busca pedidos pendentes
-        return ResponseEntity.ok(pedidosPendentes);
-    }
 
 
 

@@ -7,6 +7,7 @@ import com.crmbot.chatbot.Model.Pedidos;
 import com.crmbot.chatbot.Repository.ContatoRepository;
 import com.crmbot.chatbot.Repository.PedidosRepository;
 
+import org.springframework.cache.annotation.Cacheable;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
@@ -101,49 +102,41 @@ public Pedidos finalizarpedido(Long pedidoId) {
 
 
    
-    public List<Pedidos> buscaPedidosCancelados() {
-        return pedidosRepository.findByStatus("Finalizado");  // Exemplo de método para buscar pedidos finalizados
-    }
+   
 
-
-    public List<Pedidos> buscaPedidosPendetes() {
-        return pedidosRepository.findByStatus("Pendente");  // Exemplo de método para buscar pedidos finalizados
-    }
-
-
-
+@Cacheable(value = "pedidosCache")
     public List<Pedidos> buscarPedidosPorStatus(String status) {
-        return pedidosRepository.findByStatus(status); // Supondo que você tenha um método no seu repository
+        return pedidosRepository.findByStatus(status); 
     }
 
 
     public boolean cancelarPedido(Long pedidoId) {
         try {
-            // Logando o ID do pedido que estamos tentando cancelar
+         
             System.out.println("Tentando cancelar o pedido com ID: " +pedidoId);
     
-            // Verifica se o pedido existe no banco de dados
+           
             Pedidos pedido = pedidosRepository.findById(pedidoId).orElse(null);
             
             if (pedido == null) {
                 System.out.println("Pedido com ID " + pedidoId + " não encontrado.");
-                return false; // Pedido não encontrado
+                return false;
             }
     
-            // Logando que encontramos o pedido e estamos tentando excluí-lo
+          
             System.out.println("Pedido encontrado: " + pedido.toString() + ". Tentando excluir...");
     
-            // Deletando o pedido
+           
             pedidosRepository.delete(pedido);
     
-            // Logando o sucesso da exclusão
+           
             System.out.println("Pedido com ID " + pedidoId + " excluído com sucesso.");
-            return true; // Pedido excluído com sucesso
+            return true; 
         } catch (Exception e) {
-            // Logando qualquer erro durante o processo
+          
             System.err.println("Erro ao tentar cancelar o pedido com ID " + pedidoId + ": " + e.getMessage());
-            e.printStackTrace(); // Exibe a stack trace completa para entender onde o erro ocorre
-            return false; // Retorna false em caso de erro
+            e.printStackTrace(); 
+            return false; 
         }
     }
     
