@@ -2,9 +2,7 @@ package com.crmbot.chatbot.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.crmbot.chatbot.Model.Contato;
 import com.crmbot.chatbot.Model.Pedidos;
-import com.crmbot.chatbot.Repository.ContatoRepository;
 import com.crmbot.chatbot.Repository.PedidosRepository;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -17,36 +15,13 @@ import java.util.Optional;
 @Service
 public class ContatosService {
 
-    @Autowired
-    private ContatoRepository contatosRepository;
+
 
     @Autowired
     private PedidosRepository pedidosRepository;
 
-    // Método para registrar um contato
-    public Contato ContatosCRM(String nome, String DataeHora, String telefone, String formaPagamento, String tipoDeservico) {
-        try {
-            Contato contato = new Contato();
-            contato.setNome(nome);
-            contato.setDataeHora(DataeHora);
-            contato.setTelefone(telefone);
-            contato.setFormaPagamento(formaPagamento);
-            contato.setTipoDeservico(tipoDeservico);
+    
 
-            System.out.println("=-=-=-=- Reserva =-=-=-=- ");
-            System.out.println("Nome : " + contato.getNome());
-            System.out.println("Data e Hora : " + contato.getDataeHora());
-            System.out.println("Telefone : " + contato.getTelefone());
-            System.out.println("Tipo De Serviço : " + contato.getTipoDeservico());
-            System.out.println("Forma de Pagamento : " + contato.getFormaPagamento());
-
-            return contatosRepository.save(contato);
-
-        } catch (Exception e) {
-            System.out.println("Erro no cadastro da lead: " + e.getMessage());
-            return null;
-        }
-    }
 
    
     public Pedidos PedidosClientes(String Nome, String IntemPedido, String FormaDepagamneto) {
@@ -59,13 +34,11 @@ public class ContatosService {
             pedidos.setFormaDepagamneto(FormaDepagamneto);
             pedidos.setDataHoraRecebimento(dataHoraAtual);
 
-           
-
             System.out.println("=-=-=-=- Pedido =-=-=-=- ");
             System.out.println("Pedido : " + pedidos.getIntemPedido());
             System.out.println("Nome Do Cliente : " + pedidos.getNome());
             System.out.println("Forma de Pagamento : " + pedidos.getFormaDepagamneto());
-           
+
 
             return pedidosRepository.save(pedidos);
 
@@ -78,7 +51,7 @@ public class ContatosService {
 
 
     @Transactional
-public Pedidos finalizarpedido(Long pedidoId) {
+    public Pedidos finalizarpedido(Long pedidoId) {
     System.out.println("Iniciando finalização do pedido com ID: " + pedidoId);
     return pedidosRepository.findById(pedidoId)
             .map(pedido -> {
@@ -101,21 +74,20 @@ public Pedidos finalizarpedido(Long pedidoId) {
 }
 
 
-   
-   
 
 @Cacheable(value = "pedidosCache")
     public List<Pedidos> buscarPedidosPorStatus(String status) {
+        System.out.println("Buscando pedidos com status: " + status);
+        System.out.println("Consultando banco de dados para o status: " + status);
         return pedidosRepository.findByStatus(status); 
     }
 
-
-    public boolean cancelarPedido(Long pedidoId) {
+public boolean cancelarPedido(Long pedidoId) {
         try {
-         
+
             System.out.println("Tentando cancelar o pedido com ID: " +pedidoId);
     
-           
+        
             Pedidos pedido = pedidosRepository.findById(pedidoId).orElse(null);
             
             if (pedido == null) {
@@ -123,17 +95,17 @@ public Pedidos finalizarpedido(Long pedidoId) {
                 return false;
             }
     
-          
+    
             System.out.println("Pedido encontrado: " + pedido.toString() + ". Tentando excluir...");
     
-           
+        
             pedidosRepository.delete(pedido);
     
-           
+        
             System.out.println("Pedido com ID " + pedidoId + " excluído com sucesso.");
             return true; 
         } catch (Exception e) {
-          
+        
             System.err.println("Erro ao tentar cancelar o pedido com ID " + pedidoId + ": " + e.getMessage());
             e.printStackTrace(); 
             return false; 

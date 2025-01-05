@@ -33,27 +33,17 @@ public class ApiController {
     @Autowired
     private ContatosService contatosService;
     
-    @GetMapping("/getData")
-    public ResponseEntity<String> getData(@RequestParam(name = "nome") String nome, 
-                                          @RequestParam(name = "telefone") String telefone) {
-        System.out.println("Nome: " + nome + ", Telefone: " + telefone);
-        String responseMessage = "Nome: " + nome + ", Telefone: " + telefone;
-        return ResponseEntity.ok(responseMessage);
-    }
-
     @PostMapping("/sendData")
     public ResponseEntity<String> sendData(@RequestBody Pedidos pedidos) {
         try {
-            // Exibe os dados recebidos no console
+
             System.out.println("Dados recebidos: " + pedidos);
             System.out.println("Item do Pedido: " + pedidos.getIntemPedido());
             System.out.println("Nome: " + pedidos.getNome());
             System.out.println("Forma de Pagamento: " + pedidos.getFormaDepagamneto());
-                    // Captura a data e hora atual
+                
             
 
-    
-            // Chama o serviço para salvar os dados no CRM
             contatosService.PedidosClientes(pedidos.getNome(), pedidos.getIntemPedido(), pedidos.getFormaDepagamneto());
     
             return ResponseEntity.ok("Dados processados com sucesso");
@@ -64,8 +54,8 @@ public class ApiController {
     }
 
     @GetMapping("/getPedidos")
-public ResponseEntity<List<Pedidos>> getPedidos(@RequestParam(value = "status", defaultValue = "Pendente") String status) {
-    List<Pedidos> pedidos = contatosService.buscarPedidosPorStatus(status); // Passando status como parâmetro
+    public ResponseEntity<List<Pedidos>> getPedidos(@RequestParam(value = "status", defaultValue = "Pendente") String status) {
+    List<Pedidos> pedidos = contatosService.buscarPedidosPorStatus(status); 
     return ResponseEntity.ok(pedidos);
 }
 
@@ -83,17 +73,11 @@ public ResponseEntity<List<Pedidos>> getPedidos(@RequestParam(value = "status", 
 
 
 
-
-    @RequestMapping("/index.html")
-public String home() {
-    return "index.html"; // Nome da página HTML, se estiver no diretório "templates".
-}
-
-@DeleteMapping("/api/pedidos/{idpedido}/cancelar")
+    @DeleteMapping("/api/pedidos/{idpedido}/cancelar")
     public ResponseEntity<?> cancelarPedidos(@PathVariable("idpedido") Long idpedido){
 
         try {
-            boolean sucesso = contatosService.cancelarPedido(idpedido);  // Chama o método no serviço para cancelar o pedido
+            boolean sucesso = contatosService.cancelarPedido(idpedido); 
 
             if (sucesso) {
                 return ResponseEntity.ok("Pedido cancelado com sucesso.");
@@ -109,11 +93,11 @@ public String home() {
 
 
 
-   
-    
-  
 
-   
+    
+
+
+
     
     
 
