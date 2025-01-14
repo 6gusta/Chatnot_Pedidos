@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;  // Importando a interface correta para List
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+
 
 
 
@@ -88,6 +88,13 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao cancelar o pedido: " + e.getMessage());
         }
     }
+
+    @GetMapping("/profile")
+    public String getUserProfile() {
+        return "Usuário acessando a área pública!";
+    }
+
+   
 }
 
 

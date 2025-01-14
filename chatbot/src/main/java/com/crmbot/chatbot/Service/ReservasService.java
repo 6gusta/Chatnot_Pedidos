@@ -1,6 +1,9 @@
 package com.crmbot.chatbot.Service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.crmbot.chatbot.Model.Contato;
+import com.crmbot.chatbot.Repository.ContatoRepository;
 
 public class ReservasService {
 
