@@ -152,3 +152,63 @@ footer a:hover {
 section, table, button, footer {
     animation: fadeIn 1s ease-out;
 }
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+time-config {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.time-config label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+#timeInput {
+    padding: 10px;
+    font-size: 16px;
+    width: 80px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.3s;
+}
+#timeInput:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}

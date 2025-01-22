@@ -15,50 +15,17 @@
             <p>Obrigado pelo seu pedido! Acompanhe o status abaixo.</p>
         </header>
 
-        <div class="order-details">
-            <div>
-                <h3>Pedido #10245</h3>
-                <p><strong>Itens:</strong></p>
-                <ul>
-                    <li>Hambúrguer X - 1</li>
-                    <li>Fritas - 1</li>
-                    <li>Refrigerante - 2</li>
-                </ul>
-            </div>
-            <div>
-                <p><strong>Total:</strong> R$ 45,00</p>
-            </div>
+        <div class="order-details" id="orderDetails">
+            <!-- Os detalhes do pedido serão carregados aqui -->
         </div>
 
-        <div class="order-status">
-            <div class="status-step status-completed">
-             
-                <i class="fas fa-check-circle" style="font-size: 30px; color: green;"></i>
-                <span>Pedido Recebido</span>
-            </div>
-            <div class="status-step status-pending">
-               
-                <i class="fas fa-utensils" style="font-size: 30px; color: orange;"></i>
-                <span>Em Preparação</span>
-            </div>
-            <div class="status-step status-pending">
-        
-                <i class="fas fa-box-open" style="font-size: 30px; color: blue;"></i>
-                <span>Pronto para Envio</span>
-            </div>
-            <div class="status-step status-pending">
-               
-                <i class="fas fa-truck" style="font-size: 30px; color: red;"></i>
-                <span>Em Rota</span>
-            </div>
+        <div class="order-status" id="orderStatus">
+            <!-- Os status do pedido serão carregados aqui -->
         </div>
-        
 
-        <div class="actions">
-            <button class="cancel-btn">Cancelar Pedido</button>
-            <button class="track-btn">Rastrear Entrega</button>
-        </div>
     </div>
+
+    <script src="index.js" defer></script>
 
 </body>
 </html>

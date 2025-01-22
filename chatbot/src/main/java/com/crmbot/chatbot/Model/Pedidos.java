@@ -22,8 +22,16 @@ public class Pedidos {
     private String FormaDepagamneto;
     private String status;
     private LocalDateTime dataHoraRecebimento;
+    private String numero;
 
    
+
+    public String getNumero() {
+        return numero;
+    }
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
     public LocalDateTime getDataHoraRecebimento() {
         return dataHoraRecebimento;
     }

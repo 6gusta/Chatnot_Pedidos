@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.crmbot.chatbot.Model.Pedidos;
 import com.crmbot.chatbot.Repository.PedidosRepository;
+import com.crmbot.chatbot.Websocket.WebSocketEndpoint;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.springframework.cache.annotation.Cacheable;
 import jakarta.transaction.Transactional;
@@ -24,7 +26,7 @@ public class ContatosService {
 
 
    
-    public Pedidos PedidosClientes(String Nome, String IntemPedido, String FormaDepagamneto) {
+    public Pedidos PedidosClientes(String Nome, String IntemPedido, String FormaDepagamneto , String numero ) {
         try {
 
             LocalDateTime dataHoraAtual = LocalDateTime.now();
@@ -33,11 +35,13 @@ public class ContatosService {
             pedidos.setIntemPedido(IntemPedido);
             pedidos.setFormaDepagamneto(FormaDepagamneto);
             pedidos.setDataHoraRecebimento(dataHoraAtual);
+            pedidos.setNumero(numero);
 
             System.out.println("=-=-=-=- Pedido =-=-=-=- ");
             System.out.println("Pedido : " + pedidos.getIntemPedido());
             System.out.println("Nome Do Cliente : " + pedidos.getNome());
             System.out.println("Forma de Pagamento : " + pedidos.getFormaDepagamneto());
+            System.out.println("Nome Do Cliente : " + pedidos.getNumero());
 
 
             return pedidosRepository.save(pedidos);
@@ -75,7 +79,6 @@ public class ContatosService {
 
 
 
-@Cacheable(value = "pedidosCache")
     public List<Pedidos> buscarPedidosPorStatus(String status) {
         System.out.println("Buscando pedidos com status: " + status);
         System.out.println("Consultando banco de dados para o status: " + status);
@@ -111,7 +114,26 @@ public boolean cancelarPedido(Long pedidoId) {
             return false; 
         }
     }
+
+   public List<Pedidos> buscaPedidoPorTelefone(String numero ){
+
+    System.out.println("Buscando numero de telefone " +numero);
+
+    return pedidosRepository.findByNumero(numero);
+
     
+   }
+   public void finalizarPedido(String pedidoId) {
+    // Aqui você atualiza o pedido no banco de dados, etc.
+
+    // Depois, notifique todos os clientes via WebSocket
+    WebSocketEndpoint.enviarAtualizacao(pedidoId, "Finalizado");
+}
+
+
+
+
+
 }
 
     

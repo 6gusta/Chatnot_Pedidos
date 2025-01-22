@@ -10,6 +10,9 @@
     <header>
         <h1>Visualizar Pedidos</h1>
         <p>Bem-vindo, dono da loja! Aqui estão todos os pedidos realizados.</p>
+        <button id="configButton" title="Abrir Configurações">
+            ⚙️ Configurações
+        </button>
     </header>
 
     <nav>
@@ -51,6 +54,41 @@
                 </tbody>
         </table>
     </section>
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2>Configurações do Pedido</h2>
+            
+            <label for="numeroPedido">Número do Cliente:</label>
+            <input type="text" id="numeroPedido" placeholder="Digite o número do cliente">
+            <button id="buscarPedidosBtn">Buscar Pedidos</button>
+
+            <p>Escolha o pedido:</p>
+            <select id="pedidoSelect">
+                <!-- Os pedidos serão preenchidos aqui após a busca -->
+            </select>
+
+            <br><br>
+
+            <label for="statusSelect">Status do Pedido:</label>
+            <select id="statusSelect">
+                <option value="pendente">Pendente</option>
+                <option value="finalizado">Finalizado</option>
+            </select>
+
+            <div class="time-config">
+                <label for="timeInput">Definir tempo (minutos):</label>
+                <input type="number" id="timeInput" placeholder="30" min="1">
+            </div>
+
+            <br><br>
+
+            <button id="setStatusBtn">Aplicar Status e Iniciar Contagem</button>
+        </div>
+    </div>
+
+    <div id="countdown"></div>
+
 
   <script src="index.js"></script>
 </body>

@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-    mostrarPedidos('pendente'); // Carrega os pedidos pendentes ao carregar a página
+
+    
+    mostrarPedidos('pendente'); 
+ 
 });
 
 function mostrarPedidos(tipo) {
@@ -14,11 +17,14 @@ function mostrarPedidos(tipo) {
     }
 }
 
+
+
 function buscarPedidos(status) {
     const pedidosList = status === 'pendente' ? document.getElementById('pedidosListPendentes') : document.getElementById('pedidosListFinalizados');
     const pedidosTable = status === 'pendente' ? document.getElementById('pedidosTablePendentes') : document.getElementById('pedidosTableFinalizados');
     const loadingElement = status === 'pendente' ? document.getElementById('loadingPendentes') : document.getElementById('loadingFinalizados');
 
+    // Limpa a lista de pedidos e esconde a tabela
     pedidosList.innerHTML = '';
     pedidosTable.style.display = 'none';
 
@@ -26,7 +32,6 @@ function buscarPedidos(status) {
         loadingElement.style.display = 'block';
     }
 
-    
     fetch(`http://localhost:8080/getPedidos?status=${status}`)
         .then(response => {
             if (!response.ok) {
@@ -80,20 +85,35 @@ function finalizarPedido(pedidoId) {
     fetch(`http://localhost:8080/api/pedidos/${pedidoId}/finalizar`, { method: 'POST' })
         .then(response => {
             if (!response.ok) {
-                return response.text().then(text => {throw new Error(`Erro ao finalizar pedido (status ${response.status}): ${text}`)});
+                return response.text().then(text => { throw new Error(`Erro ao finalizar pedido (status ${response.status}): ${text}`) });
             }
             return response.json();
         })
         .then(pedidoFinalizado => {
             alert(`Pedido ${pedidoId} finalizado!`);
-        
+            
+            // Remover o pedido da tabela de pendentes
             const pedidosPendentes = document.getElementById('pedidosListPendentes');
             const pedidoElemento = pedidosPendentes.querySelector(`tr[data-pedido-id="${parseInt(pedidoId)}"]`);
             if (pedidoElemento) {
                 pedidosPendentes.removeChild(pedidoElemento);
             }
-        
-            buscarPedidos('Finalizado'); 
+            
+            // Adicionar o pedido à tabela de finalizados
+            const pedidosListFinalizados = document.getElementById('pedidosListFinalizados');
+            const pedidoRow = document.createElement('tr');
+            pedidoRow.setAttribute('data-pedido-id', pedidoId);
+            pedidoRow.innerHTML = `
+                <td>${pedidoFinalizado.nome}</td>
+                <td>${pedidoFinalizado.intemPedido}</td>
+                <td>${pedidoFinalizado.formaDepagamneto}</td>
+                <td>${pedidoFinalizado.dataHoraRecebimento}</td>
+            `;
+            pedidosListFinalizados.appendChild(pedidoRow);
+
+            // Mostrar a tabela de finalizados
+            document.getElementById('pedidosFinalizado').style.display = 'block';
+            document.getElementById('pedidosPendente').style.display = 'none';
         })
         .catch(error => {
             console.error('Erro ao finalizar pedido:', error);
@@ -103,8 +123,9 @@ function finalizarPedido(pedidoId) {
 
 
 
+
 function cancelarPedido(pedidoId) {
-    fetch(`http://localhost:80840/api/pedidos/${pedidoId}/cancelar`, {
+    fetch(`http://localhost:8080/api/pedidos/${pedidoId}/cancelar`, {
         method: 'DELETE' 
     })
     .then(response => {
@@ -139,3 +160,101 @@ function cancelarPedido(pedidoId) {
     });
 }
 
+// Seleção de elementos
+const configButton = document.getElementById('configButton');
+const configModal = document.getElementById('configModal');
+const closeModal = document.getElementById('closeModal');
+const buscarPedidosBtn = document.getElementById('buscarPedidosBtn');
+const numeroPedidoInput = document.getElementById('numeroPedido');
+const pedidoSelect = document.getElementById('pedidoSelect');
+const setStatusBtn = document.getElementById('setStatusBtn');
+const timeInput = document.getElementById('timeInput');
+
+// Abre o modal
+configButton.addEventListener('click', function () {
+    configModal.style.display = 'block';
+});
+
+// Fecha o modal
+closeModal.addEventListener('click', function () {
+    configModal.style.display = 'none';
+});
+
+// Função para buscar os pedidos pelo número
+buscarPedidosBtn.addEventListener('click', function () {
+    const numero = numeroPedidoInput.value.trim();
+
+    if (numero) {
+        // Faz a requisição ao backend
+        fetch(`http://localhost:8080/GetNumero?numero=${numero}`)
+            .then(response => response.json())
+            .then(pedidos => {
+                pedidoSelect.innerHTML = ''; // Limpa o select
+                if (pedidos.length > 0) {
+                    pedidos.forEach(pedido => {
+                        const option = document.createElement('option');
+                        option.value = pedido.idpedido; // Assumindo que o pedido tem um campo id
+                        option.textContent = `Pedido #${pedido.numero} - ${pedido.intemPedido}`;
+                        pedidoSelect.appendChild(option);
+                    });
+                } else {
+                    alert('Nenhum pedido encontrado para este número.');
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao buscar pedidos:', error);
+                alert('Erro ao buscar pedidos.');
+            });
+    } else {
+        alert('Por favor, insira um número de telefone.');
+    }
+});
+
+// Função para iniciar a contagem de 30 minutos e atualizar o pedido após o tempo
+function iniciarContagem(pedidoId, status, tempoConfig) {
+    let tempo = tempoConfig * 60; // Converter minutos em segundos
+
+    const countdownElement = document.getElementById('countdown');
+    countdownElement.innerHTML = `Tempo restante: ${tempo} segundos`;
+
+    const interval = setInterval(function () {
+        tempo--;
+        countdownElement.innerHTML = `Tempo restante: ${tempo} segundos`;
+
+        if (tempo <= 0) {
+            clearInterval(interval);
+
+            // Atualiza o pedido no backend automaticamente após o tempo
+            fetch(`http://localhost:8080/api/pedidos/${pedidoId}/finalizar`, {
+                method: 'POST',
+                body: JSON.stringify({ status: status }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('O pedido foi atualizado automaticamente após o tempo definido!');
+                    countdownElement.innerHTML = ''; // Limpa o contador após a finalização
+                })
+                .catch(error => {
+                    console.error('Erro ao finalizar pedido automaticamente:', error);
+                    alert('Erro ao finalizar pedido automaticamente.');
+                });
+        }
+    }, 1000); // Atualiza o contador a cada 1 segundo
+}
+
+// Aplicar status e iniciar contagem
+setStatusBtn.addEventListener('click', function () {
+    const pedidoId = pedidoSelect.value;
+    const status = document.getElementById('statusSelect').value;
+    const tempoConfig = parseInt(timeInput.value, 10); // Pega o valor do campo de tempo
+
+    if (pedidoId && status && tempoConfig > 0) {
+        alert(`O cronômetro de ${tempoConfig} minutos foi iniciado para este pedido.`);
+        iniciarContagem(pedidoId, status, tempoConfig);
+    } else {
+        alert('Por favor, selecione um pedido, um status e defina um tempo válido.');
+    }
+});

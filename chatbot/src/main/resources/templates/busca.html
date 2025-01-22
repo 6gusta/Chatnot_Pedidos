@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa Incrível</title>
+    <link rel="stylesheet" href="busca.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Restaurante</h1>
+            <h2>Digite o numero do seu telefone para poder acompanhar seu pedido!</h2>
+            
+        </header>
+        <div class="search-box">
+            <input type="tel" id="search" placeholder="digite aqui seu Telefone" class="search-input">
+            <button id="searchButton" class="search-button">Buscar</button>
+        </div>
+
+        <div id="orderModal" class="modal">
+            <div class="modal-content">
+                <span id="closeModal" class="close">&times;</span>
+
+                
+              
+                <div class="order-details" id="orderDetails">
+                    <!-- Os detalhes do pedido serão carregados aqui -->
+                </div>
+                <div class="order-status" id="orderStatus">
+                    <!-- Os status do pedido serão carregados aqui -->
+                    <div id="statusCompleted" class="status-step status-completed" style="display: none;">
+                        <i class="fas fa-check-circle"></i> <!-- ícone para completado -->
+                        <span>Status Completado</span>
+                    </div>
+                    
+                    <div id="statusPending" class="status-step status-pending" style="display: none;">
+
+                        <img src="4903183.png" alt="">
+      
+                        <span>Status Pendente</span>
+                    </div>
+                    
+                    <div id="statusCancelled" class="status-step status-cancelled" style="display: none;">
+                        <i class="fas fa-times-circle"></i> <!-- ícone para cancelado -->
+                        <span>Status Cancelado</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Pesquisa Incrível. Todos os direitos reservados.</p>
+        </footer>
+    </div>
+
+    <script src="Cliente.js"></script>
+</body>
+</html>

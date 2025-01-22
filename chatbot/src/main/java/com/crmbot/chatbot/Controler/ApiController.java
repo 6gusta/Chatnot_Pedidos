@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +26,11 @@ import java.time.LocalDateTime;
 
 import com.crmbot.chatbot.Model.Pedidos;
 import com.crmbot.chatbot.Service.ContatosService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://127.0.0.1:5500") // Restrinja a origem para o domínio de desenvolvimento
+
 public class ApiController {
 
     @Autowired
@@ -44,7 +47,7 @@ public class ApiController {
                 
             
 
-            contatosService.PedidosClientes(pedidos.getNome(), pedidos.getIntemPedido(), pedidos.getFormaDepagamneto());
+            contatosService.PedidosClientes(pedidos.getNome(), pedidos.getIntemPedido(), pedidos.getFormaDepagamneto(), pedidos.getNumero());
     
             return ResponseEntity.ok("Dados processados com sucesso");
         } catch (Exception e) {
@@ -58,6 +61,12 @@ public class ApiController {
     List<Pedidos> pedidos = contatosService.buscarPedidosPorStatus(status); 
     return ResponseEntity.ok(pedidos);
 }
+@GetMapping("/GetNumero")
+public ResponseEntity<List<Pedidos>> getNumero(@RequestParam("numero") String numero) {
+    List<Pedidos> pedidos = contatosService.buscaPedidoPorTelefone(numero);
+    return ResponseEntity.ok(pedidos);
+}
+
 
     @PostMapping("/api/pedidos/{idpedido}/finalizar")
     public ResponseEntity<?> finalizarPedidos(@PathVariable("idpedido") Long idpedido) {
@@ -89,13 +98,14 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/profile")
-    public String getUserProfile() {
-        return "Usuário acessando a área pública!";
-    }
+
+
+
+
+}
 
    
-}
+
 
 
 
