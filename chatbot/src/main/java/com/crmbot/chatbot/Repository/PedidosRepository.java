@@ -16,6 +16,7 @@ public interface PedidosRepository   extends JpaRepository<Pedidos, Long>  {
 	List<Pedidos> findByStatus(String string);
 
 	List<Pedidos> findByNumero(String numero);
+	
 
     
     

@@ -7,72 +7,116 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
+    <!-- Header -->
     <header>
         <h1>Visualizar Pedidos</h1>
         <p>Bem-vindo, dono da loja! Aqui estão todos os pedidos realizados.</p>
-        <button id="configButton" title="Abrir Configurações">
-            ⚙️ Configurações
-        </button>
+        <button id="configButton" title="Abrir Configurações">⚙️ Configurações</button>
+        <button id="estoqueButton" title="Abrir Estoque">🛒 Estoque</button>
+        <button id="botaoMargemLucro" class="dashboard-button">📊 Margem de Lucro</button>
     </header>
 
+    <!-- Navegação -->
     <nav>
         <button onclick="mostrarPedidos('pendente')">Pedidos Pendentes</button>
+        <button onclick="mostrarPedidos('emAndamento')">Em Andamento</button>
+        <button onclick="mostrarPedidos('saiuPraEntrega')">Saiu pra Entrega</button>
         <button onclick="mostrarPedidos('finalizado')">Pedidos Finalizados</button>
     </nav>
 
-    <section id="pedidosPendente" class="pedidos-tabela" style="display: block;">
-        <h2>Pedidos Pendentes</h2>
-        <div id="loadingPendentes" class="loading" style="display:none;">Carregando...</div>
-        <table id="pedidosTablePendentes" style="display:none;">
-            <thead>
-                <tr>
-                    <th>Nome do Cliente</th>
-                    <th>Item do Pedido</th>
-                    <th>Forma de Pagamento</th>
-                    <th>Data e Hoarario</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="pedidosListPendentes">
-                </tbody>
-        </table>
-    </section>
+    <!-- Seções de Pedidos -->
+    <main>
+        <!-- Pedidos Pendentes -->
+        <section id="pedidosPendente" class="pedidos-tabela" style="display: block;">
+            <h2>Pedidos Pendentes</h2>
+            <div id="loadingPendentes" class="loading" style="display: none;">Carregando...</div>
+            <table id="pedidosTablePendentes" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Nome do Cliente</th>
+                        <th>Item do Pedido</th>
+                        <th>Forma de Pagamento</th>
+                          <th>Numero de Telefone</th>
+                        <th>Data e Horário</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="pedidosListPendentes"></tbody>
+            </table>
+        </section>
 
-    <section id="pedidosFinalizado" class="pedidos-tabela" style="display: none;">
-        <h2>Pedidos Finalizados</h2>
-        <div id="loadingFinalizados" class="loading" style="display:none;">Carregando...</div>
-        <table id="pedidosTableFinalizados" style="display:none;">
-            <thead>
-                <tr>
-                    <th>Nome do Cliente</th>
-                    <th>Item do Pedido</th>
-                    <th>Forma de Pagamento</th>
-                    <th>Data e Hoarario</th>
-                </tr>
-            </thead>
-            <tbody id="pedidosListFinalizados">
-                </tbody>
-        </table>
-    </section>
+        <!-- Pedidos em Andamento -->
+        <section id="pedidosEmAndamento" class="pedidos-tabela" style="display: none;">
+            <h2>Pedidos em Andamento</h2>
+            <div id="loadingEmAndamento" class="loading" style="display: none;">Carregando...</div>
+            <table id="pedidosTableEmAndamento" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Nome do Cliente</th>
+                        <th>Item do Pedido</th>
+                        <th>Forma de Pagamento</th>
+                        <th>Data e Horário</th>
+                    </tr>
+                </thead>
+                <tbody id="pedidosListEmAndamento"></tbody>
+            </table>
+        </section>
+
+        <!-- Pedidos Saiu pra Entrega -->
+        <section id="pedidosSaiuPraEntrega" class="pedidos-tabela" style="display: none;">
+            <h2>Pedidos Saiu pra Entrega</h2>
+            <div id="loadingSaiuPraEntrega" class="loading" style="display: none;">Carregando...</div>
+            <table id="pedidosTableSaiuPraEntrega" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Nome do Cliente</th>
+                        <th>Item do Pedido</th>
+                        <th>Forma de Pagamento</th>
+                        <th>Data e Horário</th>
+                    </tr>
+                </thead>
+                <tbody id="pedidosListSaiuPraEntrega"></tbody>
+            </table>
+        </section>
+
+        <!-- Pedidos Finalizados -->
+        <section id="pedidosFinalizado" class="pedidos-tabela" style="display: none;">
+            <h2>Pedidos Finalizados</h2>
+            <div id="loadingFinalizados" class="loading" style="display: none;">Carregando...</div>
+            <table id="pedidosTableFinalizados" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Nome do Cliente</th>
+                        <th>Item do Pedido</th>
+                        <th>Forma de Pagamento</th>
+                        <th>Data e Horário</th>
+                        <th>Número do Cliente</th>
+                    </tr>
+                </thead>
+                <tbody id="pedidosListFinalizados"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Modal de Configurações -->
     <div id="configModal" class="modal">
         <div class="modal-content">
             <span id="closeModal" class="close">&times;</span>
             <h2>Configurações do Pedido</h2>
-            
+
             <label for="numeroPedido">Número do Cliente:</label>
             <input type="text" id="numeroPedido" placeholder="Digite o número do cliente">
             <button id="buscarPedidosBtn">Buscar Pedidos</button>
 
             <p>Escolha o pedido:</p>
-            <select id="pedidoSelect">
-                <!-- Os pedidos serão preenchidos aqui após a busca -->
-            </select>
-
-            <br><br>
+            <select id="pedidoSelect"></select>
 
             <label for="statusSelect">Status do Pedido:</label>
             <select id="statusSelect">
                 <option value="pendente">Pendente</option>
+                <option value="emAndamento">Em Andamento</option>
+                <option value="saiuPraEntrega">Saiu pra Entrega</option>
                 <option value="finalizado">Finalizado</option>
             </select>
 
@@ -81,15 +125,71 @@
                 <input type="number" id="timeInput" placeholder="30" min="1">
             </div>
 
-            <br><br>
-
             <button id="setStatusBtn">Aplicar Status e Iniciar Contagem</button>
         </div>
     </div>
-
+    
+    <!-- Contagem Regressiva -->
     <div id="countdown"></div>
 
+    <div id="estoqueModal" class="modal">
+        <div class="modal-content">
+            <span id="closeEstoqueModal" class="close">&times;</span>
+            <h2>Gerenciar Estoque</h2>
+            <p>Consulta Quantidade do Estoque</p>
+            
+            <!-- Campo para o nome do produto -->
+            <label for="produtoInput">Nome do Produto:</label>
+            <input type="text" id="produtoInput" placeholder="Digite o nome do produto"><br>
+            
+            <!-- Campo para mostrar o valor do produto -->
+            <label for="valorProduto">Valor do Produto:</label>
+            <input type="text" id="valorProduto" placeholder="Valor do produto" ><br>
 
-  <script src="index.js"></script>
+            <label for="valorProduto">Quantidade do Estoque:</label>
+            <input type="text" id="estoqueResultado" placeholder="Valor do Estoque" >
+            
+            <!-- Botão para buscar no estoque -->
+            <button id="adicionarEstoqueBtn">Consultar Estoque</button>
+
+            <button id="adicionarEstoqueBtn2">Adiciona ao  Estoque</button>
+            <button id="adicionarEstoqueBtn3" data-item-id="12">Retirar do Estoque</button>
+            
+            
+            <!-- Resultado do estoque -->
+            <div id="estoqueResultado"></div>
+        </div>
+    </div>
+    
+
+      <!-- Botão para abrir o dashboard -->
+<!-- Modal de Margem de Lucro -->
+<div id="dashboardModal"  class="modal">
+    <div id="modalContent">
+        <span id="closeDashboardModal">X</span>
+        <h2>Dashboard de Margem de Lucro</h2>
+        <select id="dateFilter" onchange="updateChart()">
+            <option value="lastWeek">Última Semana</option>
+            <option value="lastMonth">Último Mês</option>
+            <option value="lastYear">Último Ano</option>
+        </select>
+        <!-- Gráfico de barras -->
+        <canvas id="graficoLucro" width="400" height="200"></canvas>
+    
+            <h3>Total de Lucro: <span id="lucroTotal"></span></h3>
+            <h3>Despesas Totais: <span id="despesasTotais"></span></h3>
+            <h3>Porcentagem de Lucro: <span id="porcentagemLucro"></span></h3>
+        </div>
+    </div>
+</div>
+
+        
+
+    <!-- Script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+
+    <script src="index.js"></script>
+    
 </body>
 </html>

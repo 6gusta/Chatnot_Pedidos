@@ -17,7 +17,7 @@ public class SecurityConfig {
         http
             .csrf().disable()  // Desabilitar CSRF para facilitar testes
             .authorizeHttpRequests()
-            .requestMatchers("/api/admin", "/sendData", "/getPedidos", "/api/pedidos/**", "/GetNumero").permitAll()// Permite o acesso ao endpoint de criação de admin
+            .requestMatchers("/api/admin", "/sendData", "/getPedidos", "/api/pedidos/**", "/GetNumero", "/SaiuPraEntrega","/GetEstoque","/PostEstoque").permitAll() // Adicionando o novo endpoint/ Permite o acesso ao endpoint de criação de admin
             .requestMatchers("/pedido").permitAll()  
             .anyRequest().authenticated()  // Requer autenticação para qualquer outra requisição
             .and()

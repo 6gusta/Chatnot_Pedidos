@@ -212,3 +212,55 @@ time-config {
     border-color: #007BFF;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
+/* Estilo do Modal */
+#dashboardModal {
+    display: none; 
+    position: fixed;
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5); /* Fundo semi-transparente */
+    padding-top: 60px;
+}
+
+#modalContent {
+    background-color: white;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+#closeDashboardModal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+#closeDashboardModal:hover,
+#closeDashboardModal:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Estilo do gráfico */
+canvas {
+    margin-top: 20px;
+    max-width: 100%;
+    height: auto;
+}
+
+
+
+/* Adicionando um pouco de espaçamento */
+div {
+    margin-top: 20px;
+}
+

@@ -21,9 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;  // Importando a interface correta para List
 import java.time.LocalDateTime;
 
-
-
-
+import com.crmbot.chatbot.Model.Intems;
 import com.crmbot.chatbot.Model.Pedidos;
 import com.crmbot.chatbot.Service.ContatosService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,6 +33,26 @@ public class ApiController {
 
     @Autowired
     private ContatosService contatosService;
+
+    @PostMapping("/PostEstoque")
+    public ResponseEntity<String> AdcionaEstoque(@RequestBody Intems intens){
+        try {
+
+            System.out.println("Dados recebidos: " + intens);
+
+            contatosService.InserirEstoque(intens.getNomeProduto(), intens.getValor(),intens.getQtdeEstoque());
+
+            return ResponseEntity.ok("{\"message\": \"Pedidos do Estoque processados com sucesso\"}");
+
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Erro ao processar os dados", HttpStatus.BAD_REQUEST);
+
+    }
+}
+
+
     
     @PostMapping("/sendData")
     public ResponseEntity<String> sendData(@RequestBody Pedidos pedidos) {
@@ -67,6 +85,15 @@ public ResponseEntity<List<Pedidos>> getNumero(@RequestParam("numero") String nu
     return ResponseEntity.ok(pedidos);
 }
 
+@GetMapping("/GetEstoque")
+public ResponseEntity<List<Intems>> getEstoque(@RequestParam("NomeProduto") String NomeProduto){
+
+    List<Intems> intens = contatosService.BuscaEstoque(NomeProduto);
+        return ResponseEntity.ok(intens);
+    }
+    
+
+
 
     @PostMapping("/api/pedidos/{idpedido}/finalizar")
     public ResponseEntity<?> finalizarPedidos(@PathVariable("idpedido") Long idpedido) {
@@ -80,7 +107,49 @@ public ResponseEntity<List<Pedidos>> getNumero(@RequestParam("numero") String nu
         }
     }
 
+    @PostMapping("/api/pedidos/{idpedido}/EmAndamento")
+    public ResponseEntity<?> PedidosEmAndamento(@PathVariable("idpedido") Long idpedido){
+        try {
 
+            Pedidos pedidoEmAndamento = contatosService.EmAndamentos(idpedido);
+            return ResponseEntity.ok(pedidoEmAndamento);
+            
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            // TODO: handle exception
+        }
+    }
+
+    @PostMapping("/api/pedidos/{idpedido}/SaiuPraEntrega")
+    public ResponseEntity<?> SaiuPraEntrega(@PathVariable("idpedido") Long idpedido){
+        try {
+            Pedidos SaiuPraentrega = contatosService.SaiuPraEntrega(idpedido);
+
+            return ResponseEntity.ok(SaiuPraentrega);
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            // TODO: handle exception
+        }
+    }
+
+    @DeleteMapping("/api/pedidos/{idIntems}/excluir")
+    public ResponseEntity<?> excluirintem(@PathVariable("idIntems") Long idIntems){
+        try {
+            
+            boolean sucesso = contatosService.ExcluirdoEstoque(idIntems);
+            if (sucesso) {
+                return ResponseEntity.ok("Pedido cancelado com sucesso.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Intem não encontrado.");
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(" erro ao excluir intem  do estoque ");
+        }
+    }
 
     @DeleteMapping("/api/pedidos/{idpedido}/cancelar")
     public ResponseEntity<?> cancelarPedidos(@PathVariable("idpedido") Long idpedido){

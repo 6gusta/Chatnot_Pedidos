@@ -2,7 +2,10 @@ package com.crmbot.chatbot.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.crmbot.chatbot.Model.Intems;
 import com.crmbot.chatbot.Model.Pedidos;
+import com.crmbot.chatbot.Repository.IntesRepository;
 import com.crmbot.chatbot.Repository.PedidosRepository;
 import com.crmbot.chatbot.Websocket.WebSocketEndpoint;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,7 +27,22 @@ public class ContatosService {
 
     
 
+    @Autowired
 
+    private IntesRepository intemsRepository;
+
+    public Intems InserirEstoque(  String nomeProduto, String valor,String qtdeEstoque ){
+        Intems intens = new Intems();
+
+        intens.setNomeProduto(nomeProduto);
+        intens.setValor(valor);
+        intens.setQtdeEstoque(qtdeEstoque);
+
+
+        return  intemsRepository.save(intens);
+
+
+    }
    
     public Pedidos PedidosClientes(String Nome, String IntemPedido, String FormaDepagamneto , String numero ) {
         try {
@@ -36,6 +54,19 @@ public class ContatosService {
             pedidos.setFormaDepagamneto(FormaDepagamneto);
             pedidos.setDataHoraRecebimento(dataHoraAtual);
             pedidos.setNumero(numero);
+            
+
+            List<Intems> itens = intemsRepository.findByNomeProduto(IntemPedido);
+
+            if (!itens.isEmpty()) {  // Verifica se encontrou pelo menos um item
+                Intems item = itens.get(0);  // Pega o primeiro item da lista
+                double total = Double.parseDouble(item.getValor());  // Converte o valor para double
+                pedidos.setTotal(total);
+            } else {
+                pedidos.setTotal(0);  // Caso não encontre o item, define total como 0
+            }
+            
+            
 
             System.out.println("=-=-=-=- Pedido =-=-=-=- ");
             System.out.println("Pedido : " + pedidos.getIntemPedido());
@@ -77,6 +108,62 @@ public class ContatosService {
             .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + pedidoId));
 }
 
+@Transactional
+public Pedidos EmAndamentos( Long pedidoId){
+    System.out.println("mundando status para em Andamento do pedido com ID: " + pedidoId);
+    return pedidosRepository.findById(pedidoId)
+    .map(pedido ->{
+        try {
+
+            pedido.setStatus("emAndamento");
+            Pedidos pesalvos = pedidosRepository.save(pedido);
+            System.out.println("Pedido salvo: " + pesalvos);
+            LocalDateTime dataHoraAtual = LocalDateTime.now();
+            Pedidos pedidos = new Pedidos();
+            pedidos.setDataHoraRecebimento(dataHoraAtual);
+
+            return pesalvos;
+            
+        } catch (Exception e) {
+
+            System.err.println("Erro ao salvar o pedido: " + e.getMessage()); // Log de erro
+            e.printStackTrace(); // Imprime o stack trace para depuração
+            throw new RuntimeException("Erro ao salvar o pedido: " + e.getMessage(), e);
+            // TODO: handle exception
+        }
+
+    })
+    .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + pedidoId));
+}
+
+@Transactional
+public Pedidos SaiuPraEntrega(Long pedidoId){
+    System.out.println("mundando status para Saiu Pra entrega  do pedido com ID: " + pedidoId);
+
+    return  pedidosRepository.findById(pedidoId)
+    .map(pedidos ->{
+        try {
+            pedidos.setStatus("saiuPraEntrega");
+            Pedidos pedidoentrega = pedidosRepository.save(pedidos);
+            System.out.println("Pedido salvo: " + pedidoentrega);
+            LocalDateTime dataHoraAtual = LocalDateTime.now();
+            Pedidos pedidosentrega = new Pedidos();
+            pedidos.setDataHoraRecebimento(dataHoraAtual);
+            return pedidoentrega;
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar o pedido: " + e.getMessage()); // Log de erro
+            e.printStackTrace(); // Imprime o stack trace para depuração
+            throw new RuntimeException("Erro ao salvar o pedido: " + e.getMessage(), e);
+            // TODO: handle exception
+        
+        }
+
+    }) .orElseThrow(() -> new RuntimeException("Pedido não encontrado com ID: " + pedidoId));
+}
+
+
+
+
 
 
     public List<Pedidos> buscarPedidosPorStatus(String status) {
@@ -84,6 +171,47 @@ public class ContatosService {
         System.out.println("Consultando banco de dados para o status: " + status);
         return pedidosRepository.findByStatus(status); 
     }
+
+
+    public List<Intems> BuscaEstoque(  String  NomeProduto){
+
+        System.out.println("Buscando intem...: " + NomeProduto);
+
+        
+
+        return    intemsRepository.findByNomeProduto(NomeProduto);
+  
+
+        
+    }
+
+
+public  boolean ExcluirdoEstoque(Long idIntems ){
+    try {
+        System.out.println("busacando do estoque pra excluir com o id "+ idIntems);
+        Intems intens = intemsRepository.findById(idIntems).orElse(null);
+
+        if(intens == null){
+            System.out.println("Intem com o ID " + idIntems+ " não encontrado");
+            return false;
+        }
+
+        System.out.println("Intem Encontrado"+ intens.toString() + " Tentato retirar do Estoque...." );
+
+
+        intemsRepository.delete(intens);
+
+        System.out.println("Intem com ID " + idIntems + " excluído com sucesso.");
+
+        return true; 
+
+
+    } catch (Exception e) {
+        System.err.println("Erro ao tentar cancelar o Intems com ID " + idIntems+ ": " + e.getMessage());
+        e.printStackTrace(); 
+        return false; 
+    }
+}
 
 public boolean cancelarPedido(Long pedidoId) {
         try {

@@ -6,31 +6,56 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function mostrarPedidos(tipo) {
-    if (tipo === 'pendente') {
-        document.getElementById('pedidosPendente').style.display = 'block';
-        document.getElementById('pedidosFinalizado').style.display = 'none';
-        buscarPedidos('pendente'); // Passando o status como Pendente
-    } else {
-        document.getElementById('pedidosPendente').style.display = 'none';
-        document.getElementById('pedidosFinalizado').style.display = 'block';
-        buscarPedidos('Finalizado'); // Passando o status como Finalizado
+    const sections = document.querySelectorAll('.pedidos-tabela');
+    sections.forEach(section => section.style.display = 'none'); // Oculta todas as seções
+
+    const selectedSection = document.getElementById(`pedidos${capitalizeFirstLetter(tipo)}`);
+    if (selectedSection) {
+        selectedSection.style.display = 'block'; // Mostra apenas a seção correspondente
+        buscarPedidos(tipo);
     }
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 
 
 function buscarPedidos(status) {
-    const pedidosList = status === 'pendente' ? document.getElementById('pedidosListPendentes') : document.getElementById('pedidosListFinalizados');
-    const pedidosTable = status === 'pendente' ? document.getElementById('pedidosTablePendentes') : document.getElementById('pedidosTableFinalizados');
-    const loadingElement = status === 'pendente' ? document.getElementById('loadingPendentes') : document.getElementById('loadingFinalizados');
+    const elementos = {
+        pendente: {
+            lista: document.getElementById('pedidosListPendentes'),
+            tabela: document.getElementById('pedidosTablePendentes'),
+            loading: document.getElementById('loadingPendentes'),
+        },
+        finalizado: {
+            lista: document.getElementById('pedidosListFinalizados'),
+            tabela: document.getElementById('pedidosTableFinalizados'),
+            loading: document.getElementById('loadingFinalizados'),
+        },
+        emAndamento: {
+            lista: document.getElementById('pedidosListEmAndamento'),
+            tabela: document.getElementById('pedidosTableEmAndamento'),
+            loading: document.getElementById('loadingEmAndamento'),
+        },
+        saiuPraEntrega: {
+            lista: document.getElementById('pedidosListSaiuPraEntrega'),
+            tabela: document.getElementById('pedidosTableSaiuPraEntrega'),
+            loading: document.getElementById('loadingSaiuPraEntrega'),
+        },
+    };
 
-    // Limpa a lista de pedidos e esconde a tabela
-    pedidosList.innerHTML = '';
-    pedidosTable.style.display = 'none';
-
-    if (loadingElement) {
-        loadingElement.style.display = 'block';
+    const { lista, tabela, loading } = elementos[status] || {};
+    if (!lista || !tabela || !loading) {
+        console.error('Status inválido:', status);
+        return;
     }
+
+    // Limpa a lista e esconde a tabela
+    lista.innerHTML = '';
+    tabela.style.display = 'none';
+    loading.style.display = 'block';
 
     fetch(`http://localhost:8080/getPedidos?status=${status}`)
         .then(response => {
@@ -40,46 +65,178 @@ function buscarPedidos(status) {
             return response.json();
         })
         .then(pedidos => {
-            if (loadingElement) {
-                loadingElement.style.display = 'none';
-            }
+            loading.style.display = 'none';
             if (pedidos && pedidos.length > 0) {
-                popularTabela(pedidos, pedidosList, status);
-                pedidosTable.style.display = 'table';
+                popularTabela(pedidos, lista, status);
+                tabela.style.display = 'table';
             } else {
-                pedidosList.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum pedido encontrado.</td></tr>';
-                pedidosTable.style.display = 'table';
+                lista.innerHTML = `<tr><td colspan="4" style="text-align: center;">Nenhum pedido ${status} encontrado.</td></tr>`;
+                tabela.style.display = 'table';
             }
         })
         .catch(error => {
-            if (loadingElement) {
-                loadingElement.style.display = 'none';
-            }
+            loading.style.display = 'none';
             console.error('Erro ao buscar pedidos:', error);
             alert('Erro ao carregar pedidos: ' + error.message);
         });
 }
 
 function popularTabela(pedidos, tabela, status) {
-    tabela.innerHTML = '';
+    tabela.innerHTML = ''; // Limpa a tabela antes de popular os dados
+
     pedidos.forEach(pedido => {
         const row = document.createElement('tr');
-        row.setAttribute('data-pedido-id', parseInt(pedido.idpedido)); 
+        row.setAttribute('data-pedido-id', parseInt(pedido.idpedido)); // Adiciona ID como atributo
 
+        // Verifica e formata os dados recebidos
+        const nome = pedido.nome || 'Nome não informado';
+        const itemPedido = pedido.intemPedido || 'Item não informado';
+        const formaDePagamento = pedido.FormaDepagamneto || 'Pagamento não informado';
+        const dataRecebimento = pedido.dataHoraRecebimento
+            ? new Date(pedido.dataHoraRecebimento).toLocaleString()
+            : 'Data não informada';
+        
+        const total = pedido.total !== undefined ? pedido.total : 'Total não informado';
+       const telefone = pedido.numero || 'Numero não informado'
+
+        // Constrói a linha da tabela
         row.innerHTML = `
-            <td>${pedido.nome || 'Nome não informado'}</td>
-            <td>${pedido.intemPedido || 'Item não informado'}</td>
-            <td>${pedido.formaDepagamneto || 'Pagamento não informado'}</td>
-            <td>${pedido.dataHoraRecebimento || 'data não informado'}</td>
+            <td>${nome}</td>
+            <td>${itemPedido}</td>
+            <td>${formaDePagamento}</td>
+             <td>${telefone}</td>
+            <td>${dataRecebimento}</td>
+             <td>${total}</td>
             ${status === 'pendente' ? `
                 <td>
-                    <button class="finalizar" onclick="finalizarPedido(${pedido.idpedido})">Finalizar</button>
+                    <button class="em-andamento" onclick="emAndamento(${pedido.idpedido}, 'emAndamento')">Em Andamento</button>
+                    <button class="saiu-pra-entrega" onclick="saiuPraEntrega(${pedido.idpedido}, 'saiuPraEntrega')">Saiu Pra Entrega</button>
+                    <button class="finalizar" onclick="finalizarPedido(${pedido.idpedido}, 'finalizado')">Finalizar</button>
                     <button class="cancelar" onclick="cancelarPedido(${pedido.idpedido})">Cancelar</button>
-                </td>` : ''}
+                </td>
+                
+                
+            ` : status === 'emAndamento' ? `
+                <td>
+                    <button class="saiu-pra-entrega" onclick="saiuPraEntrega(${pedido.idpedido}, 'saiuPraEntrega')">Saiu Pra Entrega</button>
+                    <button class="finalizar" onclick="finalizarPedido(${pedido.idpedido}, 'finalizado')">Finalizar</button>
+                           <button class="cancelar" onclick="cancelarPedido(${pedido.idpedido})">Cancelar</button>
+                </td>
+                
+            ` : status === 'saiuPraEntrega' ? `
+                <td>
+                    <button class="finalizar" onclick="finalizarPedido(${pedido.idpedido}, 'finalizado')">Finalizar</button>
+                           <button class="cancelar" onclick="cancelarPedido(${pedido.idpedido})">Cancelar</button>
+                </td>
+                
+            ` : ''}
         `;
-        tabela.appendChild(row);
+
+        tabela.appendChild(row); // Adiciona a linha à tabela
     });
 }
+
+function saiuPraEntrega(pedidoId) {
+    fetch(`http://localhost:8080/api/pedidos/${pedidoId}/SaiuPraEntrega`, { method: 'POST' })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(`Erro ao atualizar pedido: ${text}`); });
+            }
+            return response.json();
+        })
+        .then(pedidoAtualizado => {
+            alert(`Pedido ${pedidoId} marcado como "Saiu Pra Entrega"!`);
+
+            // Remover o pedido da tabela de pendentes
+            const pedidosPendentes = document.getElementById('pedidosListPendentes');
+            if (pedidosPendentes) {
+                const pedidoElemento = pedidosPendentes.querySelector(`tr[data-pedido-id="${pedidoId}"]`);
+                if (pedidoElemento) {
+                    pedidosPendentes.removeChild(pedidoElemento);
+                }
+            }
+
+            // Adicionar o pedido à tabela de pedidos "Saiu Para Entrega"
+            const pedidosListSaiuParaEntrega = document.getElementById('pedidosListSaiuParaEntrega');
+            if (pedidosListSaiuParaEntrega) {
+                const pedidoRow = document.createElement('tr');
+                pedidoRow.setAttribute('data-pedido-id', pedidoId);
+                pedidoRow.innerHTML = `
+                    <td>${pedidoAtualizado.nome || 'Nome não informado'}</td>
+                    <td>${pedidoAtualizado.intemPedido || 'Item não informado'}</td>
+                    <td>${pedidoAtualizado.formaDePagamento || 'Pagamento não informado'}</td>
+                    <td>${new Date(pedidoAtualizado.dataHoraRecebimento).toLocaleString() || 'Data não informada'}</td>
+                    <td>${pedidoAtualizado.numero || 'Número não informado'}</td>
+                `;
+                pedidosListSaiuParaEntrega.appendChild(pedidoRow);
+            } else {
+                console.error("Elemento 'pedidosListSaiuParaEntrega' não encontrado.");
+            }
+
+            // Mostrar a tabela de pedidos que saíram para entrega
+            const pedidosSaiuParaEntrega = document.getElementById('pedidosSaiuParaEntrega');
+            if (pedidosSaiuParaEntrega) {
+                pedidosSaiuParaEntrega.style.display = 'block';
+            } else {
+                console.error("Elemento 'pedidosSaiuParaEntrega' não encontrado.");
+            }
+
+            const pedidosPendentesContainer = document.getElementById('pedidosPendentes');
+            if (pedidosPendentesContainer) {
+                pedidosPendentesContainer.style.display = 'none';
+            } else {
+                console.error("Elemento 'pedidosPendentes' não encontrado.");
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao marcar pedido como "Saiu Pra Entrega":', error);
+            alert('Erro ao atualizar status do pedido.');
+        });
+}
+
+
+
+function emAndamento(pedidoId) {
+    fetch(`http://localhost:8080/api/pedidos/${pedidoId}/EmAndamento`, { method: 'POST' })
+    
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(`Erro ao marcar pedido como "Em Andamento": ${text}`); });
+            }
+            return response.json();
+        })
+        .then(pedidoAtualizado => {
+            alert(`Pedido ${pedidoId} marcado como "Em Andamento"!`);
+            
+            // Remover o pedido da tabela de pendentes
+            const pedidosPendentes = document.getElementById('pedidosListPendentes');
+            const pedidoElemento = pedidosPendentes.querySelector(`tr[data-pedido-id="${parseInt(pedidoId)}"]`);
+            if (pedidoElemento) {
+                pedidosPendentes.removeChild(pedidoElemento);
+            }
+            
+            // Adicionar o pedido à tabela de "Em Andamento"
+            const pedidosListEmAndamento = document.getElementById('pedidosListEmAndamento');
+            const pedidoRow = document.createElement('tr');
+            pedidoRow.setAttribute('data-pedido-id', pedidoId);
+            pedidoRow.innerHTML = `
+                <td>${pedidoAtualizado.nome || 'Nome não informado'}</td>
+                <td>${pedidoAtualizado.itemPedido || 'Item não informado'}</td>
+                <td>${pedidoAtualizado.formaDePagamento || 'Pagamento não informado'}</td>
+                <td>${new Date(pedidoAtualizado.dataHoraRecebimento).toLocaleString() || 'Data não informada'}</td>
+            `;
+            pedidosListEmAndamento.appendChild(pedidoRow);
+
+            // Mostrar a tabela de pedidos em andamento
+            document.getElementById('pedidosEmAndamento').style.display = 'block';
+            document.getElementById('pedidosPendentes').style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Erro ao marcar pedido como "Em Andamento":', error);
+            alert('Erro ao atualizar status do pedido.');
+        });
+}
+
 
 function finalizarPedido(pedidoId) {
     fetch(`http://localhost:8080/api/pedidos/${pedidoId}/finalizar`, { method: 'POST' })
@@ -159,6 +316,8 @@ function cancelarPedido(pedidoId) {
         alert('Erro ao cancelar pedido!');
     });
 }
+
+
 
 // Seleção de elementos
 const configButton = document.getElementById('configButton');
@@ -258,3 +417,231 @@ setStatusBtn.addEventListener('click', function () {
         alert('Por favor, selecione um pedido, um status e defina um tempo válido.');
     }
 });
+
+
+
+
+
+configButton.onclick = () => {
+    configModal.style.display = "block";
+};
+
+closeModal.onclick = () => {
+    configModal.style.display = "none";
+};
+
+// Abrir e fechar modal de estoque
+const estoqueModal = document.getElementById("estoqueModal");
+const estoqueButton = document.getElementById("estoqueButton");
+const closeEstoqueModal = document.getElementById("closeEstoqueModal");
+
+estoqueButton.onclick = () => {
+    estoqueModal.style.display = "block";
+};
+
+closeEstoqueModal.onclick = () => {
+    estoqueModal.style.display = "none";
+};
+
+// Abrir e fechar modal de dashboard
+const dashboardModal = document.getElementById("dashboardModal");
+const botaoMargemLucro = document.getElementById("botaoMargemLucro");
+const closeDashboardModal = document.getElementById("closeDashboardModal");
+
+botaoMargemLucro.onclick = () => {
+    dashboardModal.style.display = "block";
+    atualizarDashboard(); // Atualiza os dados e o gráfico
+};
+
+closeDashboardModal.onclick = () => {
+    dashboardModal.style.display = "none";
+};
+
+// Fechar modais ao clicar fora deles
+window.onclick = (event) => {
+    // Fechar modal de estoque ao clicar fora dele
+    if (event.target === estoqueModal) {
+        estoqueModal.style.display = "none";
+    }
+
+    // Fechar modal de dashboard ao clicar fora dele
+    if (event.target === dashboardModal) {
+        dashboardModal.style.display = "none";
+    }
+};
+
+// Função para exibir os dados no dashboard
+function atualizarDashboard() {
+    const dadosLucro = {
+        total: 50000,
+        despesas: 30000,
+        margemLucro: 50000 - 30000, // Lucro é a diferença entre total e despesas
+        porcentagem: 40
+    };
+
+    // Atualizando os dados de texto
+    document.getElementById('lucroTotal').textContent = dadosLucro.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('despesasTotais').textContent = dadosLucro.despesas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('porcentagemLucro').textContent = `${dadosLucro.porcentagem}%`;
+
+    // Gráfico de barras
+    const ctx = document.getElementById('graficoLucro').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Lucro', 'Despesas'],
+            datasets: [{
+                label: 'Valores (R$)',
+                data: [dadosLucro.margemLucro, dadosLucro.despesas],
+                backgroundColor: ['#4caf50', '#f44336'],
+                borderColor: ['#388e3c', '#d32f2f'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+// Elementos do modal
+
+
+const adicionarEstoqueBtn = document.getElementById('adicionarEstoqueBtn');
+const produtoInput = document.getElementById('produtoInput');
+const valorProduto = document.getElementById('valorProduto');
+const estoqueResultado = document.getElementById('estoqueResultado');
+const adicionarEstoqueBtn2 = document.getElementById('adicionarEstoqueBtn2');
+
+// Evento para buscar o produto e exibir informações
+adicionarEstoqueBtn.addEventListener('click', () => {
+    const produto = produtoInput.value.trim();
+
+    if (!produto) {
+        alert("Por favor, insira o nome do produto.");
+        return;
+    }
+
+    // Fazer a requisição à API
+    fetch(`http://localhost:8080/GetEstoque?NomeProduto=${produto}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.length > 0) {
+                // Preencher o valor do produto no campo readonly
+                valorProduto.value = data[0].valor;
+                estoqueResultado.value = data[0].qtdeEstoque;
+
+                // Mostrar os resultados do estoque
+                let resultHTML = '<ul>';
+                data.forEach(item => {
+                    resultHTML += `<li>Nome do  Intem : ${item.nomeProduto}
+                     Quantidade Do intem no Estoque: ${item.qtdeEstoque}</li>`;
+                });
+                resultHTML += '</ul>';
+                estoqueResultado.innerHTML = resultHTML;
+            } else {
+                estoqueResultado.innerHTML = 'Nenhum produto encontrado.';
+            }
+        })
+        .catch(error => {
+            console.error('Erro na requisição:', error);
+            estoqueResultado.innerHTML = 'Erro ao consultar o estoque.';
+        });
+});
+
+
+
+
+const adicionarEstoque = () => {
+    const nomeProduto = produtoInput.value;
+    const valor = parseFloat(valorProduto.value);
+    const qtdeEstoque = parseInt(estoqueResultado.value);
+
+    if (!nomeProduto || isNaN(valor) || isNaN(qtdeEstoque)) {
+        alert("Preencha todos os campos corretamente antes de adicionar ao estoque.");
+        return;
+    }
+
+    const dados = {
+        nomeProduto: nomeProduto,
+        valor: valor,
+        qtdeEstoque: qtdeEstoque
+    };
+
+    fetch("http://localhost:8080/PostEstoque", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Estoque atualizado com sucesso!");
+        console.log("Resposta do servidor:", data);
+    })
+    .catch(error => {
+        console.error("Erro ao atualizar o estoque:", error);
+        alert("Erro ao atualizar o estoque.");
+    });
+};
+
+document.getElementById("adicionarEstoqueBtn2").addEventListener("click", adicionarEstoque);
+
+
+
+
+function excluirItemEstoque(idIntems) {
+    fetch(`http://localhost:8080/api/pedidos/${idIntems}/excluir`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (response.ok) {
+            alert(`Item ${idIntems} retirado do estoque!`);
+            console.log(`Item ${idIntems} excluído com sucesso no servidor.`);
+            
+            const listaItens = document.getElementById('itensEstoque');
+            const itemElemento = listaItens.querySelector(`tr[data-item-id="${parseInt(idIntems)}"]`);
+            if (itemElemento) {
+                listaItens.removeChild(itemElemento);
+                console.log(`Item ${idIntems} removido da lista no DOM.`);
+            } else {
+                console.log(`Elemento do item ${idIntems} não encontrado no DOM.`);
+            }
+        } else {
+            alert('Erro ao excluir item!');
+            console.log('Erro ao excluir o item, status HTTP:', response.status);
+
+            response.text().then(text => {
+                console.log('Detalhes do erro do servidor:', text);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao excluir item:', error);
+        alert('Erro ao excluir item!');
+    });
+}
+
+document.getElementById("adicionarEstoqueBtn3").addEventListener("click", function() {
+    const idIntems = this.getAttribute("data-item-id"); 
+    if (idIntems) {
+        excluirItemEstoque(idIntems);
+    } else {
+        alert("ID do item não encontrado.");
+    }
+});
+

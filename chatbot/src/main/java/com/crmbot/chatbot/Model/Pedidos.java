@@ -23,9 +23,16 @@ public class Pedidos {
     private String status;
     private LocalDateTime dataHoraRecebimento;
     private String numero;
+    private double total; 
 
    
 
+    public double getTotal() {
+        return total;
+    }
+    public void setTotal(double total) {
+        this.total = total;
+    }
     public String getNumero() {
         return numero;
     }
