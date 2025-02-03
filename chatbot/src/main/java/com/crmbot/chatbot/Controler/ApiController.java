@@ -31,6 +31,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class ApiController {
 
+
+    @GetMapping("/total")
+    public double getTotalVendas() {
+        return contatosService.calcularTotalVendas();
+    }
+    
+
     @Autowired
     private ContatosService contatosService;
 

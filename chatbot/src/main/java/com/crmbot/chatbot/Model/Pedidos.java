@@ -2,6 +2,8 @@ package com.crmbot.chatbot.Model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,11 +21,13 @@ public class Pedidos {
     private String DataHora;
     private String Nome;
     private String IntemPedido;
+    @JsonProperty("formaDePagamento")
     private String FormaDepagamneto;
     private String status;
     private LocalDateTime dataHoraRecebimento;
     private String numero;
     private double total; 
+    
 
    
 

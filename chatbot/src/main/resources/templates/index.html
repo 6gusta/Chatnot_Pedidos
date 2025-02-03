@@ -9,7 +9,7 @@
 <body>
     <!-- Header -->
     <header>
-        <h1>Visualizar Pedidos</h1>
+        <h1>Visualizador de Pedidos</h1>
         <p>Bem-vindo, dono da loja! Aqui estão todos os pedidos realizados.</p>
         <button id="configButton" title="Abrir Configurações">⚙️ Configurações</button>
         <button id="estoqueButton" title="Abrir Estoque">🛒 Estoque</button>
@@ -103,7 +103,7 @@
     <div id="configModal" class="modal">
         <div class="modal-content">
             <span id="closeModal" class="close">&times;</span>
-            <h2>Configurações do Pedido</h2>
+            <h3>Configurações do Pedido</h3>
 
             <label for="numeroPedido">Número do Cliente:</label>
             <input type="text" id="numeroPedido" placeholder="Digite o número do cliente">
@@ -135,7 +135,7 @@
     <div id="estoqueModal" class="modal">
         <div class="modal-content">
             <span id="closeEstoqueModal" class="close">&times;</span>
-            <h2>Gerenciar Estoque</h2>
+            <h3>Gerenciar Estoque</h3>
             <p>Consulta Quantidade do Estoque</p>
             
             <!-- Campo para o nome do produto -->
@@ -167,18 +167,23 @@
 <div id="dashboardModal"  class="modal">
     <div id="modalContent">
         <span id="closeDashboardModal">X</span>
-        <h2>Dashboard de Margem de Lucro</h2>
-        <select id="dateFilter" onchange="updateChart()">
+        <h3>Dashboard de Margem de Lucro</h3>
+        <select id="dateFilter" onchange="atualizarDashboard()">
             <option value="lastWeek">Última Semana</option>
             <option value="lastMonth">Último Mês</option>
             <option value="lastYear">Último Ano</option>
+            <option value="last24Hours">Últimas 24 Horas</option>
+            <option value="last5Days">Últimos 5 Dias</option>
+            <option value="lastWeekdays">Últimos Dias Úteis</option>
+            <option value="specificDayOfMonth">Dia Específico do Mês</option>
+            <option value="specificDayOfWeek">Dia Específico da Semana</option>
         </select>
+        <input type="number" id="specificDayInput" placeholder="Dia específico" style="display:none;">
         <!-- Gráfico de barras -->
         <canvas id="graficoLucro" width="400" height="200"></canvas>
     
             <h3>Total de Lucro: <span id="lucroTotal"></span></h3>
-            <h3>Despesas Totais: <span id="despesasTotais"></span></h3>
-            <h3>Porcentagem de Lucro: <span id="porcentagemLucro"></span></h3>
+     
         </div>
     </div>
 </div>

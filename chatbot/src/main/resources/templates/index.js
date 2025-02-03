@@ -91,12 +91,14 @@ function popularTabela(pedidos, tabela, status) {
         // Verifica e formata os dados recebidos
         const nome = pedido.nome || 'Nome não informado';
         const itemPedido = pedido.intemPedido || 'Item não informado';
-        const formaDePagamento = pedido.FormaDepagamneto || 'Pagamento não informado';
+        const formaDePagamento = pedido.formaDepagamneto|| "Pagamento não informado";
         const dataRecebimento = pedido.dataHoraRecebimento
             ? new Date(pedido.dataHoraRecebimento).toLocaleString()
             : 'Data não informada';
         
-        const total = pedido.total !== undefined ? pedido.total : 'Total não informado';
+            const total = pedido.total !== undefined 
+            ? pedido.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) 
+            : 'Total não informado';
        const telefone = pedido.numero || 'Numero não informado'
 
         // Constrói a linha da tabela
@@ -443,76 +445,93 @@ closeEstoqueModal.onclick = () => {
     estoqueModal.style.display = "none";
 };
 
-// Abrir e fechar modal de dashboard
 const dashboardModal = document.getElementById("dashboardModal");
 const botaoMargemLucro = document.getElementById("botaoMargemLucro");
 const closeDashboardModal = document.getElementById("closeDashboardModal");
 
+// Abrir modal e atualizar os dados
 botaoMargemLucro.onclick = () => {
     dashboardModal.style.display = "block";
-    atualizarDashboard(); // Atualiza os dados e o gráfico
+    atualizarDashboard();
 };
 
+// Fechar modal ao clicar no botão "X"
 closeDashboardModal.onclick = () => {
     dashboardModal.style.display = "none";
 };
 
-// Fechar modais ao clicar fora deles
+// Fechar modal ao clicar fora dele
 window.onclick = (event) => {
-    // Fechar modal de estoque ao clicar fora dele
-    if (event.target === estoqueModal) {
-        estoqueModal.style.display = "none";
-    }
-
-    // Fechar modal de dashboard ao clicar fora dele
     if (event.target === dashboardModal) {
         dashboardModal.style.display = "none";
     }
 };
 
-// Função para exibir os dados no dashboard
-function atualizarDashboard() {
-    const dadosLucro = {
-        total: 50000,
-        despesas: 30000,
-        margemLucro: 50000 - 30000, // Lucro é a diferença entre total e despesas
-        porcentagem: 40
-    };
+// Função para atualizar os dados do Dashboard com dados reais do back-end
+async function atualizarDashboard() {
+    try {
+        // Captura o valor selecionado no filtro
+        const filtro = document.getElementById('dateFilter').value;
 
-    // Atualizando os dados de texto
-    document.getElementById('lucroTotal').textContent = dadosLucro.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('despesasTotais').textContent = dadosLucro.despesas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('porcentagemLucro').textContent = `${dadosLucro.porcentagem}%`;
+        // Faz a requisição para o backend, enviando o filtro como parâmetro
+        const respostaVendas = await fetch(`http://localhost:8080/total?periodo=${filtro}`);
+        
+        // Verifica se a resposta foi bem-sucedida
+        if (!respostaVendas.ok) {
+            throw new Error('Erro ao recuperar os dados do backend');
+        }
 
-    // Gráfico de barras
-    const ctx = document.getElementById('graficoLucro').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Lucro', 'Despesas'],
-            datasets: [{
-                label: 'Valores (R$)',
-                data: [dadosLucro.margemLucro, dadosLucro.despesas],
-                backgroundColor: ['#4caf50', '#f44336'],
-                borderColor: ['#388e3c', '#d32f2f'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        // Converte a resposta para JSON
+        const totalVendas = await respostaVendas.json();
+
+        // Atualiza os valores na interface
+        document.getElementById('lucroTotal').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        // Atualiza o gráfico
+        const ctx = document.getElementById('graficoLucro').getContext('2d');
+
+        // Remove o gráfico anterior antes de criar um novo
+        if (window.meuGrafico) {
+            window.meuGrafico.destroy();
+        }
+
+        // Cria um novo gráfico com os dados recebidos
+        window.meuGrafico = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Lucro'],
+                datasets: [{
+                    label: 'Valores (R$)',
+                    data: [totalVendas],
+                    backgroundColor: ['#4caf50'],
+                    borderColor: ['#388e3c'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
+
+    } catch (error) {
+        console.error('Erro ao carregar os dados:', error);
+        // Exibe uma mensagem de erro na interface caso haja falha
+        document.getElementById('lucroTotal').textContent = 'Erro ao carregar os dados';
+    }
 }
-// Elementos do modal
+
+// Chama a função ao carregar a página para exibir os dados iniciais
+atualizarDashboard();
+
 
 
 const adicionarEstoqueBtn = document.getElementById('adicionarEstoqueBtn');

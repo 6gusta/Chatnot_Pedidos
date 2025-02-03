@@ -11,11 +11,16 @@ import com.crmbot.chatbot.Websocket.WebSocketEndpoint;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.springframework.cache.annotation.Cacheable;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import javax.management.Query;
 
 @Service
 public class ContatosService {
@@ -30,6 +35,11 @@ public class ContatosService {
     @Autowired
 
     private IntesRepository intemsRepository;
+
+    public double calcularTotalVendas() {
+        return pedidosRepository.calcularTotalVendasDeHoje().orElse(0.0);
+    }
+    
 
     public Intems InserirEstoque(  String nomeProduto, String valor,String qtdeEstoque ){
         Intems intens = new Intems();

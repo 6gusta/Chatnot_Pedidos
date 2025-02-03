@@ -10,11 +10,10 @@ body {
 }
 
 header {
-    background-color: #007bff; /* Azul forte */
-    color: white;
+    background-color:#F0F0F0; /* Azul forte */
+    color: #333;
     padding: 40px;
     text-align: center;
-    border-bottom: 5px solid #0056b3; /* Borda inferior para dar um detalhe */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Sombra sutil para destacar */
 }
 
@@ -28,6 +27,10 @@ h1 {
 h2 {
     font-size: 1.5rem;
     color: #f0f0f0; /* Subtítulo mais suave */
+}
+h3 {
+    font-size: 1.5rem;
+    color: black; /* Subtítulo mais suave */
 }
 
 button {
@@ -86,7 +89,7 @@ th, td {
 }
 
 th {
-    background-color: #007bff;
+    background-color: #555555;
     color: white;
     font-weight: 700;
 }
