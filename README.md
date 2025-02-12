@@ -27,7 +27,7 @@ Este é um chatbot para restaurantes criado com [Typebot](https://typebot.io/), 
    ```
 2. Acesse a pasta do projeto:
    ```sh
-   cd seu-repositorio
+   cd 6gusta
    ```
 3. Configure o banco de dados MySQL no **application.properties**:
    ```properties
@@ -49,12 +49,11 @@ Este é um chatbot para restaurantes criado com [Typebot](https://typebot.io/), 
 2. Configure as requisições HTTP para chamar a API usando a URL do **Ngrok**
 3. Publique e teste o chatbot
 
-## Demonstração
-![Fluxo do Chatbot](./image.png)
+
 
 ## Contribuição
 Contribuições são bem-vindas! Fique à vontade para abrir issues e pull requests.
 
 ## Autor
-Desenvolvido por [Seu Nome](https://github.com/seu-usuario).
+Desenvolvido por [Luiz Gustavo[(https://github.com/6gusta/Chatnot_Pedidos.git).
 
