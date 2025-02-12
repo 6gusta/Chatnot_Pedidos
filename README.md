@@ -1,6 +1,6 @@
 # Chatbot de Restaurante com Typebot e API Java
 
-![Chatbot de Restaurante](https://via.placeholder.com/800x400.png?text=Chatbot+de+Restaurante)
+![Chatbot de Restaurante](./image.png)
 
 ## Descrição do Projeto
 Este é um chatbot para restaurantes criado com [Typebot](https://typebot.io/), integrado a uma API em Java para registrar pedidos e gerenciar o sistema de vendas. O projeto conta com uma interface para clientes, vendedores e administradores.
@@ -50,7 +50,7 @@ Este é um chatbot para restaurantes criado com [Typebot](https://typebot.io/), 
 3. Publique e teste o chatbot
 
 ## Demonstração
-![Fluxo do Chatbot](https://via.placeholder.com/800x400.png?text=Fluxo+do+Chatbot)
+![Fluxo do Chatbot](./image.png)
 
 ## Contribuição
 Contribuições são bem-vindas! Fique à vontade para abrir issues e pull requests.
