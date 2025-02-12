@@ -23,7 +23,7 @@ Este é um chatbot para restaurantes criado com [Typebot](https://typebot.io/), 
 ### Backend (API Java)
 1. Clone o repositório:
    ```sh
-   git clone https://github.com/seu-usuario/seu-repositorio.git
+   git clone https://github.com/6gusta/Chatnot_Pedidos.git
    ```
 2. Acesse a pasta do projeto:
    ```sh
